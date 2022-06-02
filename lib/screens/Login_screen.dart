@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? 'processing..'
                                 : 'Login'),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xfff60a5b),
+                              primary: Color(0xff0a5c02),
                             ),
                             onPressed: () {
                               if (!AuthController.isLoading.value) {

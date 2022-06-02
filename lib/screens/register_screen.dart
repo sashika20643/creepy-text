@@ -29,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Color.fromARGB(255, 16, 12, 42),
       body: SingleChildScrollView(
         child: Container(
+          height: MediaQuery.of(context).size.height,
           color: Color.fromARGB(255, 16, 12, 42),
           child: Center(
               child: Column(
@@ -77,7 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: ElevatedButton(
                             child: Text('Register'),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xfff60a5b),
+                              primary: Color(0xff0a5c02),
                             ),
                             onPressed: () {
                               if (_formkey.currentState!.validate()) {

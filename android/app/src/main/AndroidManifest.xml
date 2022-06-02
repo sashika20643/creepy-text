@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.first_project">
+    <!-- <uses-permission android:name="android.permission.INTERNET" -->
    <application
-        android:label="first_project"
+        android:label="Creepy Text"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

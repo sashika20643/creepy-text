@@ -1,3 +1,5 @@
+import 'package:first_project/screens/friendly_decrypt.dart';
+
 import '../auth_controller.dart';
 import 'encrypt_screen.dart';
 import 'decrypt_screen.dart';
@@ -81,10 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(children: [
-                      Image(
-                        image: AssetImage('assets/images/decryptwithkey.png'),
-                        width: 100,
-                        height: 100,
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (_) {
+                            return FrindlyDecrypt();
+                          }));
+                        },
+                        child: Image(
+                          image: AssetImage('assets/images/decryptwithkey.png'),
+                          width: 100,
+                          height: 100,
+                        ),
                       ),
                       SizedBox(height: 15),
                       Text(

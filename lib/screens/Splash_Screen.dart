@@ -6,9 +6,14 @@ class Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 16, 12, 42),
       body: Center(
         child: Container(
-            child: Text("Splash Screen", style: TextStyle(fontSize: 24))),
+            child: Image(
+          image: AssetImage('assets/images/logo.png'),
+          width: 200,
+          height: 200,
+        )),
       ),
     );
   }
