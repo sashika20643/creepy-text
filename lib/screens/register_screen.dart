@@ -26,88 +26,91 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Color.fromARGB(255, 16, 12, 42),
-        child: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image(
-              image: AssetImage('assets/images/logo.png'),
-              width: 200,
-              height: 200,
-            ),
-            Form(
-              key: _formkey,
-              // autovalidateMode: AutovalidateMode.always,
-              child: Container(
-                margin: const EdgeInsets.all(35.0),
-                child: Center(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextFormField(
-                      decoration: tfdecoration,
-                      validator: emailValidate,
-                      onSaved: (text) {
-                        _email = text!;
-                      },
-                    ),
-                    SizedBox(height: 50),
-                    TextFormField(
-                      obscureText: true,
-                      decoration: tfdecoration.copyWith(
-                          hintText: "Password",
-                          prefixIcon: Icon(
-                            Icons.lock,
-                            color: Color.fromARGB(255, 255, 255, 255),
-                          )),
-                      validator: pwValidate,
-                      onSaved: (text) {
-                        _pw = text!;
-                      },
-                    ),
-                    SizedBox(height: 50),
-                    Container(
-                      child: SizedBox(
-                        width: 200.0,
-                        height: 50.0,
-                        child: ElevatedButton(
-                          child: Text('Register'),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color(0xfff60a5b),
+      backgroundColor: Color.fromARGB(255, 16, 12, 42),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Color.fromARGB(255, 16, 12, 42),
+          child: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(
+                image: AssetImage('assets/images/logo.png'),
+                width: 200,
+                height: 200,
+              ),
+              Form(
+                key: _formkey,
+                // autovalidateMode: AutovalidateMode.always,
+                child: Container(
+                  margin: const EdgeInsets.all(35.0),
+                  child: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextFormField(
+                        decoration: tfdecoration,
+                        validator: emailValidate,
+                        onSaved: (text) {
+                          _email = text!;
+                        },
+                      ),
+                      SizedBox(height: 50),
+                      TextFormField(
+                        obscureText: true,
+                        decoration: tfdecoration.copyWith(
+                            hintText: "Password",
+                            prefixIcon: Icon(
+                              Icons.lock,
+                              color: Color.fromARGB(255, 255, 255, 255),
+                            )),
+                        validator: pwValidate,
+                        onSaved: (text) {
+                          _pw = text!;
+                        },
+                      ),
+                      SizedBox(height: 50),
+                      Container(
+                        child: SizedBox(
+                          width: 200.0,
+                          height: 50.0,
+                          child: ElevatedButton(
+                            child: Text('Register'),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xfff60a5b),
+                            ),
+                            onPressed: () {
+                              if (_formkey.currentState!.validate()) {
+                                _formkey.currentState?.save();
+                                print(_email);
+                                AuthController.instance.register(_email, _pw);
+                              }
+                            },
                           ),
-                          onPressed: () {
-                            if (_formkey.currentState!.validate()) {
-                              _formkey.currentState?.save();
-                              print(_email);
-                              AuthController.instance.register(_email, _pw);
-                            }
-                          },
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    TextButton(
-                      style: ButtonStyle(),
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (_) {
-                          return LoginScreen();
-                        }));
-                      },
-                      child: Text("have an account? Login",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              decoration: TextDecoration.underline)),
-                    ),
-                  ],
-                )),
-              ),
-            )
-          ],
-        )),
+                      SizedBox(height: 20),
+                      TextButton(
+                        style: ButtonStyle(),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (_) {
+                            return LoginScreen();
+                          }));
+                        },
+                        child: Text("have an account? Login",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                decoration: TextDecoration.underline)),
+                      ),
+                    ],
+                  )),
+                ),
+              )
+            ],
+          )),
+        ),
       ),
     );
   }

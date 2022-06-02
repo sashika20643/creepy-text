@@ -14,6 +14,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 16, 12, 42),
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 96, 105, 99),
         title: Text("ECT APP"),
       ),
       body: SingleChildScrollView(
