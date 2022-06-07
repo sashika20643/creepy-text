@@ -1,9 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' hide Key;
 import 'dart:math';
-import 'package:encrypt/encrypt.dart'; // for the utf8.encode method
-import 'dart:convert';
-import 'package:pointycastle/asymmetric/api.dart';
-import 'package:pointycastle/asymmetric/api.dart';
+import 'package:encrypt/encrypt.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:get/get.dart';
 
 class EncryptScreen extends StatefulWidget {
   @override
@@ -12,14 +12,25 @@ class EncryptScreen extends StatefulWidget {
 
 class _EncryptScreenState extends State<EncryptScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
+  var massege_id;
+
   String dropdownvalue = 'Salsa 20';
   var _plaintext;
   var items = [
     'Salsa 20',
     'AES',
   ];
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   var ekey = "";
+
   var enctext = "";
+  var _email = "";
+//data base part start
+  final databaseRef = FirebaseDatabase.instance.ref();
+
+//data base part end
 
   void Salsa() {
     setState(() {
@@ -39,7 +50,8 @@ class _EncryptScreenState extends State<EncryptScreen> {
       final encrypter = Encrypter(Salsa20(key));
 
       final encrypted = encrypter.encrypt(plainText, iv: iv);
-      enctext = encrypted.base64;
+      generateId();
+      enctext = massege_id + encrypted.base64;
     });
   }
 
@@ -61,7 +73,8 @@ class _EncryptScreenState extends State<EncryptScreen> {
       final encrypter = Encrypter(AES(key));
 
       final encrypted = encrypter.encrypt(plainText, iv: iv);
-      enctext = encrypted.base64;
+      generateId();
+      enctext = massege_id + encrypted.base64;
     });
   }
 
@@ -159,6 +172,69 @@ class _EncryptScreenState extends State<EncryptScreen> {
                   " $ekey",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
+                SizedBox(
+                  height: 15,
+                ),
+                Visibility(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              elevation: 16,
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                    left: 10, right: 10, top: 50),
+                                height:
+                                    MediaQuery.of(context).size.height * 0.3,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Form(
+                                        key: _formKey2,
+                                        child: TextFormField(
+                                            decoration: InputDecoration(
+                                              hintText: "Input email",
+                                              filled: true,
+                                              hintStyle: TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 255, 255, 255)),
+                                              fillColor: Color.fromARGB(
+                                                  255, 141, 138, 138),
+                                            ),
+                                            validator: emailValidate,
+                                            onSaved: (text) {
+                                              _email = text!;
+                                            }),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      ElevatedButton.icon(
+                                        onPressed: () async {
+                                          _formKey2.currentState?.save();
+
+                                          await checkIfEmailInUse(_email);
+
+                                          // sendkey(ekey, _email, dropdownvalue);
+                                        },
+                                        icon: Icon(Icons.send),
+                                        label: Text("send key"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
+                    },
+                    icon: Icon(Icons.send),
+                    label: Text("send key"),
+                  ),
+                  visible: ekey == "" ? false : true,
+                ),
                 SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
@@ -195,5 +271,82 @@ class _EncryptScreenState extends State<EncryptScreen> {
         ],
       ),
     );
+  }
+
+  String? emailValidate(text) {
+    RegExp regExp = new RegExp(r'^(?=.*?@)(?=.*?[.])');
+    if (text!.isEmpty) {
+      return "Email cannot be empty";
+    } else if (!regExp.hasMatch(text)) {
+      return "Not a valid email";
+    }
+    return null;
+  }
+
+  Future<bool> checkIfEmailInUse(String emailAddress) async {
+    try {
+      // Fetch sign-in methods for the email address
+      final list =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(emailAddress);
+
+      // In case list is not empty
+      if (list.isNotEmpty) {
+        // Return true because there is an existing
+        // user using the email address
+        sendkey(ekey, _email, dropdownvalue);
+        Get.snackbar(
+          "About user",
+          ".",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Color.fromARGB(255, 35, 113, 28),
+          titleText: Text(
+            "Successfully sended",
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+        print("have");
+        return true;
+      } else {
+        print("not have");
+        // Return false because email adress is not in use
+        Get.snackbar(
+          "About user",
+          "try with another email.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Color.fromARGB(255, 113, 103, 28),
+          titleText: Text(
+            "No user found",
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+        return false;
+      }
+    } catch (error) {
+      // Handle error
+      // ...
+      return true;
+    }
+  }
+
+  void generateId() {
+    final User? user = auth.currentUser;
+    final uid = user?.uid;
+    DateTime now = DateTime.now();
+    massege_id = uid! +
+        now.year.toString() +
+        now.month.toString() +
+        now.day.toString() +
+        now.hour.toString() +
+        now.minute.toString() +
+        now.second.toString();
+  }
+
+  void sendkey(String key, String email, String algo) async {
+    print(email);
+    await databaseRef
+        .child("permission")
+        .push()
+        .set({'ID': email + massege_id, 'key': key, 'algo_type': algo});
+    Navigator.of(context, rootNavigator: true).pop('dialog');
   }
 }

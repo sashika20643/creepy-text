@@ -1,6 +1,11 @@
+import 'dart:ffi';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart' hide Key;
 
-import 'package:encrypt/encrypt.dart'; // for the utf8.encode method
+import 'package:encrypt/encrypt.dart';
+import 'package:get/get.dart'; // for the utf8.encode method
 
 class DecryptScreen extends StatefulWidget {
   @override
@@ -9,17 +14,61 @@ class DecryptScreen extends StatefulWidget {
 
 class _DecryptScreenState extends State<DecryptScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final databaseRef = FirebaseDatabase.instance.ref();
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   String dropdownvalue = 'Salsa 20';
   var _plaintext;
-  var items = [
-    'Salsa 20',
-    'AES',
-  ];
+  var massege_id;
 
   var ekey;
   var enctext = "";
-  void encrypt() {
+
+  Future<void> checkPremisson() async {
+    try {
+      DatabaseReference ref = FirebaseDatabase.instance.ref("permission");
+      final User? user = auth.currentUser;
+      final email = user?.email;
+      var mid = massege_id;
+      await ref.orderByChild("ID").equalTo(email! + mid).once().then((event) {
+        if (event.snapshot.value != null) {
+          Map<dynamic, dynamic> items =
+              event.snapshot.value as Map<dynamic, dynamic>;
+          ekey = items.values.toList().first["key"];
+          var algo_type = items.values.toList().first["algo_type"];
+          if (algo_type == "AES")
+            decryptAes();
+          else if (algo_type == "Salsa 20") decryptSalsa20();
+        } else {
+          Get.snackbar(
+            "About permission",
+            "You do not have permission",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Color.fromARGB(255, 113, 103, 28),
+            titleText: Text(
+              "check again",
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        }
+      });
+      // FirebaseFirestore.instance
+      //     .collection("permission")
+      //     .where('user_id', isEqualTo: email)
+      //     .where('massege_id',
+      //         isEqualTo: 'kBAnD51XFVf2V5xri8LO3dGeKLJ22022669126')
+      //     .get()
+      //     .then((QuerySnapshot querySnapshot) {
+      //               querySnapshot.docs.forEach((doc) {
+      //       print(doc["first_name"]);
+      //   });
+      //   });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void decryptAes() {
     setState(() {
       final key = Key.fromUtf8(ekey);
       final iv = IV.fromLength(16);
@@ -35,7 +84,7 @@ class _DecryptScreenState extends State<DecryptScreen> {
   void decryptSalsa20() {
     setState(() {
       final key = Key.fromUtf8(ekey);
-      final iv = IV.fromLength(16);
+      final iv = IV.fromLength(8);
 
       final encrypter = Encrypter(Salsa20(key));
 
@@ -59,49 +108,10 @@ class _DecryptScreenState extends State<DecryptScreen> {
             key: _formKey,
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Color.fromARGB(255, 96, 105, 99),
-                      border: Border.all()),
-                  child: DropdownButton(
-                    // Initial Value
-                    value: dropdownvalue,
-
-                    // Down Arrow Icon
-                    focusColor: Colors.grey,
-                    dropdownColor: Color.fromARGB(255, 96, 105, 99),
-                    style: TextStyle(color: Colors.white),
-                    icon: Padding(
-                        //Icon at tail, arrow bottom is default icon
-                        padding: EdgeInsets.only(left: 20),
-                        child: Icon(
-                          Icons.arrow_circle_down_sharp,
-                          color: Colors.white,
-                        )),
-                    isExpanded: true,
-
-                    // Array list of items
-                    items: items.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    // After selecting the desired option,it will
-                    // change button value to selected value
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        dropdownvalue = newValue!;
-                      });
-                    },
-                  ),
-                ),
                 SizedBox(height: 20),
                 TextFormField(
                   decoration: InputDecoration(
-                    hintText: "Input text to encrypt",
+                    hintText: "Input text to decrypt",
                     filled: true,
                     hintStyle:
                         TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
@@ -115,25 +125,12 @@ class _DecryptScreenState extends State<DecryptScreen> {
                     return null;
                   },
                   onSaved: (text) {
-                    _plaintext = text;
+                    _plaintext = text?.substring(40, text.length);
+                    massege_id = text?.substring(0, 40);
+                    print(massege_id);
                   },
                 ),
                 SizedBox(height: 16),
-                Text("Key",
-                    style: TextStyle(color: Colors.green, fontSize: 20)),
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Input key to encrypt",
-                    filled: true,
-                    hintStyle:
-                        TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-                    fillColor: Color.fromARGB(255, 141, 138, 138),
-                  ),
-                  maxLength: 20,
-                  onSaved: (text) {
-                    ekey = text;
-                  },
-                ),
                 SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
@@ -147,7 +144,8 @@ class _DecryptScreenState extends State<DecryptScreen> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      encrypt();
+
+                      checkPremisson();
                     }
                   },
                   child: Text('Decrypt'),

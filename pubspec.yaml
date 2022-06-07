@@ -31,8 +31,11 @@ dependencies:
   flutter_pdfview: ^1.2.1
   firebase_core: ^1.17.1
   firebase_auth: ^3.3.19
+  firebase_database: ^9.0.15
+  # cloud_firestore: ^3.1.17
   get: ^4.6.5
   flutter_launcher_icons: ^0.9.2
+  
 
 dev_dependencies:
   crypto: ^3.0.1

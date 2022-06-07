@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onTap: () {
                               Navigator.of(context)
                                   .push(MaterialPageRoute(builder: (_) {
-                                return DecryptScreen();
+                                return FrindlyDecrypt();
                               }));
                             },
                             child: Image(
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         onTap: () {
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (_) {
-                            return FrindlyDecrypt();
+                            return DecryptScreen();
                           }));
                         },
                         child: Image(
