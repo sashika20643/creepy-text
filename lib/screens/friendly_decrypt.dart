@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Key;
 import 'package:encrypt/encrypt.dart';
+import 'dart:convert';
 import 'package:get/get.dart'; // for the utf8.encode method
 
 class FrindlyDecrypt extends StatefulWidget {
@@ -16,13 +17,26 @@ class _FrindlyDecryptState extends State<FrindlyDecrypt> {
   var items = [
     'Salsa 20',
     'AES',
+    'Fernet'
   ];
 
   var ekey;
   var enctext = "";
 
   //database part
+void decryptfernet() {
+    setState(() {
+      final key = Key.fromUtf8(ekey);
+     final iv = IV.fromLength(16);
+    
+    final fernet = Fernet(key);
+      final encrypter = Encrypter(fernet);
+   
+     
+      final decrypted =encrypter.decrypt64(_plaintext);
 
+      enctext = decrypted.toString();
+    });}
   void decryptAes() {
     setState(() {
       final key = Key.fromUtf8(ekey);
@@ -48,6 +62,7 @@ class _FrindlyDecryptState extends State<FrindlyDecrypt> {
       enctext = decrypted.toString();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +159,7 @@ class _FrindlyDecryptState extends State<FrindlyDecrypt> {
                               color: Color.fromARGB(255, 255, 255, 255)),
                           fillColor: Color.fromARGB(255, 141, 138, 138),
                         ),
-                        maxLength: 20,
+                        maxLength: 40,
                         onSaved: (text) {
                           ekey = text;
                         },
@@ -167,6 +182,9 @@ class _FrindlyDecryptState extends State<FrindlyDecrypt> {
                               decryptAes();
                             } else if (dropdownvalue == "Salsa 20") {
                               decryptSalsa20();
+                            }
+                            else if (dropdownvalue == "Fernet") {
+                              decryptfernet();
                             }
                           }
                         },

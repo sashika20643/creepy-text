@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:encrypt/encrypt.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class EncryptScreen extends StatefulWidget {
   @override
@@ -13,6 +15,8 @@ class EncryptScreen extends StatefulWidget {
 class _EncryptScreenState extends State<EncryptScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
+static Encrypted? fernetEncrypted;
+static var fernetDecrypted;
   var massege_id;
 
   String dropdownvalue = 'Salsa 20';
@@ -20,6 +24,7 @@ class _EncryptScreenState extends State<EncryptScreen> {
   var items = [
     'Salsa 20',
     'AES',
+    'Fernet'
   ];
   FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -31,6 +36,20 @@ class _EncryptScreenState extends State<EncryptScreen> {
   final databaseRef = FirebaseDatabase.instance.ref();
 
 //data base part end
+// void RSA(){
+
+//    final publicKey = await parseKeyFromFile<RSAPublicKey>('test/public.pem');
+//   final privKey = await parseKeyFromFile<RSAPrivateKey>('test/private.pem');
+//   final plainText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit';
+//   final encrypter = Encrypter(RSA(publicKey: publicKey, privateKey: privKey));
+
+//   final encrypted = encrypter.encrypt(plainText);
+//   final decrypted = encrypter.decrypt(encrypted);
+
+//   print(decrypted); // Lorem ipsum dolor sit amet, consectetur adipiscing elit
+//   print(encrypted.base64); 
+// }
+
 
   void Salsa() {
     setState(() {
@@ -54,6 +73,34 @@ class _EncryptScreenState extends State<EncryptScreen> {
       enctext = massege_id + encrypted.base64;
     });
   }
+void fernet(){
+  
+
+     setState(() {
+     
+      const _chars =
+          'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890*&^%#@!?/';
+      Random _rnd = Random();
+
+      String getRandomString(int length) =>
+          String.fromCharCodes(Iterable.generate(
+              length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+      final plainText = '$_plaintext';
+      ekey = getRandomString(32);
+      final key = Key.fromUtf8(ekey);
+      final iv = IV.fromLength(16);
+    
+    final fernet = Fernet(key);
+      final encrypter = Encrypter(fernet);
+
+      final encrypted = encrypter.encrypt(plainText, iv: iv);
+      generateId();
+      enctext = massege_id + encrypted.base64;
+       fernetDecrypted = encrypter.decrypt(encrypted);
+    print(fernetDecrypted);
+    });
+
+}
 
   void ASE() {
     print("AES");
@@ -252,6 +299,9 @@ class _EncryptScreenState extends State<EncryptScreen> {
                         Salsa();
                       } else if (dropdownvalue == "AES") {
                         ASE();
+                      }
+                      else if (dropdownvalue == "Fernet") {
+                        fernet();
                       }
                     }
                     print("pressed");
