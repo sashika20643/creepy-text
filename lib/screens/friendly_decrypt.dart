@@ -14,29 +14,26 @@ class _FrindlyDecryptState extends State<FrindlyDecrypt> {
   String dropdownvalue = 'Salsa 20';
   var _plaintext;
   var massege_id;
-  var items = [
-    'Salsa 20',
-    'AES',
-    'Fernet'
-  ];
+  var items = ['Salsa 20', 'AES', 'Fernet'];
 
   var ekey;
   var enctext = "";
 
   //database part
-void decryptfernet() {
+  void decryptfernet() {
     setState(() {
       final key = Key.fromUtf8(ekey);
-     final iv = IV.fromLength(16);
-    
-    final fernet = Fernet(key);
+      final iv = IV.fromLength(16);
+
+      final fernet = Fernet(key);
       final encrypter = Encrypter(fernet);
-   
-     
-      final decrypted =encrypter.decrypt64(_plaintext);
+
+      final decrypted = encrypter.decrypt64(_plaintext);
 
       enctext = decrypted.toString();
-    });}
+    });
+  }
+
   void decryptAes() {
     setState(() {
       final key = Key.fromUtf8(ekey);
@@ -62,7 +59,6 @@ void decryptfernet() {
       enctext = decrypted.toString();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +134,8 @@ void decryptfernet() {
                           return null;
                         },
                         onSaved: (text) {
-                          _plaintext = text?.substring(40, text.length);
-                          massege_id = text?.substring(0, 40);
+                          _plaintext = text?.substring(8, text.length);
+                          massege_id = text?.substring(0, 8);
                           print(massege_id);
                         },
                       ),
@@ -182,8 +178,7 @@ void decryptfernet() {
                               decryptAes();
                             } else if (dropdownvalue == "Salsa 20") {
                               decryptSalsa20();
-                            }
-                            else if (dropdownvalue == "Fernet") {
+                            } else if (dropdownvalue == "Fernet") {
                               decryptfernet();
                             }
                           }

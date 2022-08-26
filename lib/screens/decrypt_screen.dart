@@ -7,6 +7,7 @@ import 'package:flutter/material.dart' hide Key;
 import 'package:encrypt/encrypt.dart';
 import 'package:get/get.dart'; // for the utf8.encode method
 import 'package:crypto/crypto.dart';
+
 class DecryptScreen extends StatefulWidget {
   @override
   State<DecryptScreen> createState() => _DecryptScreenState();
@@ -38,7 +39,8 @@ class _DecryptScreenState extends State<DecryptScreen> {
           var algo_type = items.values.toList().first["algo_type"];
           if (algo_type == "AES")
             decryptAes();
-          else if (algo_type == "Salsa 20") decryptSalsa20();
+          else if (algo_type == "Salsa 20")
+            decryptSalsa20();
           else if (algo_type == "Fernet") decryptfernet();
         } else {
           Get.snackbar(
@@ -98,17 +100,17 @@ class _DecryptScreenState extends State<DecryptScreen> {
   void decryptfernet() {
     setState(() {
       final key = Key.fromUtf8(ekey);
-     final iv = IV.fromLength(16);
-    
-    final fernet = Fernet(key);
+      final iv = IV.fromLength(16);
+
+      final fernet = Fernet(key);
       final encrypter = Encrypter(fernet);
-   
-     
-      final decrypted =encrypter.decrypt64(_plaintext);
+
+      final decrypted = encrypter.decrypt64(_plaintext);
 
       enctext = decrypted.toString();
-    });}
-    
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +134,7 @@ class _DecryptScreenState extends State<DecryptScreen> {
                         TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
                     fillColor: Color.fromARGB(255, 141, 138, 138),
                   ),
-                  maxLines: 5,
+                  maxLines: 10,
                   validator: (text) {
                     if (text!.isEmpty) {
                       return "text cannot be empty";
@@ -140,8 +142,8 @@ class _DecryptScreenState extends State<DecryptScreen> {
                     return null;
                   },
                   onSaved: (text) {
-                    _plaintext = text?.substring(40, text.length);
-                    massege_id = text?.substring(0, 40);
+                    _plaintext = text?.substring(8, text.length);
+                    massege_id = text?.substring(0, 8);
                     print(massege_id);
                   },
                 ),

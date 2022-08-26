@@ -15,17 +15,13 @@ class EncryptScreen extends StatefulWidget {
 class _EncryptScreenState extends State<EncryptScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
-static Encrypted? fernetEncrypted;
-static var fernetDecrypted;
+  static Encrypted? fernetEncrypted;
+  static var fernetDecrypted;
   var massege_id;
 
   String dropdownvalue = 'Salsa 20';
   var _plaintext;
-  var items = [
-    'Salsa 20',
-    'AES',
-    'Fernet'
-  ];
+  var items = ['Salsa 20', 'AES', 'Fernet'];
   FirebaseAuth auth = FirebaseAuth.instance;
 
   var ekey = "";
@@ -47,15 +43,14 @@ static var fernetDecrypted;
 //   final decrypted = encrypter.decrypt(encrypted);
 
 //   print(decrypted); // Lorem ipsum dolor sit amet, consectetur adipiscing elit
-//   print(encrypted.base64); 
+//   print(encrypted.base64);
 // }
-
 
   void Salsa() {
     setState(() {
       print("Salsa20");
       const _chars =
-          'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890*&^%#@!?/';
+          'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
       Random _rnd = Random();
 
       String getRandomString(int length) =>
@@ -73,13 +68,11 @@ static var fernetDecrypted;
       enctext = massege_id + encrypted.base64;
     });
   }
-void fernet(){
-  
 
-     setState(() {
-     
+  void fernet() {
+    setState(() {
       const _chars =
-          'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890*&^%#@!?/';
+          'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
       Random _rnd = Random();
 
       String getRandomString(int length) =>
@@ -89,18 +82,17 @@ void fernet(){
       ekey = getRandomString(32);
       final key = Key.fromUtf8(ekey);
       final iv = IV.fromLength(16);
-    
-    final fernet = Fernet(key);
+
+      final fernet = Fernet(key);
       final encrypter = Encrypter(fernet);
 
       final encrypted = encrypter.encrypt(plainText, iv: iv);
       generateId();
       enctext = massege_id + encrypted.base64;
-       fernetDecrypted = encrypter.decrypt(encrypted);
-    print(fernetDecrypted);
+      fernetDecrypted = encrypter.decrypt(encrypted);
+      print(fernetDecrypted);
     });
-
-}
+  }
 
   void ASE() {
     print("AES");
@@ -299,8 +291,7 @@ void fernet(){
                         Salsa();
                       } else if (dropdownvalue == "AES") {
                         ASE();
-                      }
-                      else if (dropdownvalue == "Fernet") {
+                      } else if (dropdownvalue == "Fernet") {
                         fernet();
                       }
                     }
@@ -382,13 +373,16 @@ void fernet(){
     final User? user = auth.currentUser;
     final uid = user?.uid;
     DateTime now = DateTime.now();
-    massege_id = uid! +
-        now.year.toString() +
-        now.month.toString() +
-        now.day.toString() +
-        now.hour.toString() +
-        now.minute.toString() +
-        now.second.toString();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    Random _rnd = Random();
+
+    String getRandomString(int length) =>
+        String.fromCharCodes(Iterable.generate(
+            length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+    massege_id = getRandomString(8);
+
+    print(massege_id);
   }
 
   void sendkey(String key, String email, String algo) async {
