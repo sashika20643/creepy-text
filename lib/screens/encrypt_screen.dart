@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:encrypt/encrypt.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EncryptScreen extends StatefulWidget {
   @override
@@ -305,7 +305,19 @@ class _EncryptScreenState extends State<EncryptScreen> {
                 SelectableText(
                   "$enctext",
                   style: TextStyle(color: Colors.white, fontSize: 16),
-                )
+                ),
+                Visibility(
+                  child: IconButton(
+                    onPressed: () async {
+                      final url = 'https://api.whatsapp.com/send?text=$enctext';
+                      await launch(url);
+                    },
+                    icon: Icon(Icons.whatsapp),
+                    color: Colors.green,
+                    iconSize: 50,
+                  ),
+                  visible: ekey == "" ? false : true,
+                ),
               ],
             ),
           )
@@ -392,5 +404,14 @@ class _EncryptScreenState extends State<EncryptScreen> {
         .push()
         .set({'ID': email + massege_id, 'key': key, 'algo_type': algo});
     Navigator.of(context, rootNavigator: true).pop('dialog');
+  }
+
+  Future<void> _launchInBrowser(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw 'Could not launch $url';
+    }
   }
 }
