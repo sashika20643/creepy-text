@@ -1,10 +1,10 @@
 # first_project
 
-A new Flutter project.
+Creepy text.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+this is a secure encrypt app wich is using three algorithms to encrypt.
 
 A few resources to get you started if this is your first Flutter project:
 
